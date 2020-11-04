@@ -1,6 +1,7 @@
-package running;
+//package running;
 
 public class Run {
+	
 	public double distance; //in kms
 	public int time; //in seconds
 
@@ -30,7 +31,24 @@ public class Run {
 	 * @param run
 	 */
 	public void addToEnd(Run run) {
-		//to be completed
+		Run temporary=new Run(run);
+		if(this.next==null && this.prev ==null){
+			this.next=temporary;
+			this.next.prev=this;
+			this.next.next=null;
+			temporary=null;
+			
+		}else{
+			Run temp=this;
+			while(temp.next!=null){
+				temp=temp.next;
+			}
+			temp.next=temporary;
+			temporary.prev=temp;
+			temporary.next=null;
+			temporary=null;
+			temp=null;
+		} 
 	}
 
 	/**
@@ -39,7 +57,23 @@ public class Run {
 	 * @param run
 	 */
 	public void addToFront(Run run) {
-		//to be completed
+		Run temporary=new Run(run);
+		if(this.next==null&& this.prev==null){
+			this.prev=temporary;
+			temporary.next=this;
+			temporary.prev=null;
+			temporary=null;
+		}else{
+			Run temp=this;
+			while(temp.prev!=null){
+				temp=temp.prev;
+			}
+			temp.prev=temporary;
+			temporary.prev=null;
+			temporary.next=temp;
+			temporary=null;
+			temp=null;
+		}
 	}
 
 	/**
@@ -47,7 +81,22 @@ public class Run {
 	 * @return number of objects in the list in which the calling object exists
 	 */
 	public int size() {
-		return 0; //to be completed
+		if(this==null){return 0;}
+		if(this.prev==null&&this.next==null){return 1;}
+		else{
+			int count=0;
+			Run temp=this;
+			while(temp.prev!=null){
+				temp=temp.prev;
+			}
+			if(temp.prev==null){
+				while(temp!=null){
+					count++;
+					temp=temp.next;
+				}
+			}
+			return count;          
+		}
 	}
 
 	/**
@@ -56,7 +105,23 @@ public class Run {
 	 * the index of the first object in the list is 0.
 	 */
 	public int getIndex() {
-		return 0; //to be completed
+		if(this==null){return -1;}
+            if(this.prev==null&&this.next==null){
+		return 0;
+            }else{
+                int count=0;
+		Run temp=this;
+                while(temp.prev!=null){
+                    temp=temp.prev;
+                }
+                if(temp.prev==null){
+                    while(temp!=this){
+                        count++;
+                        temp=temp.next;
+                    }
+                }
+                return count;          
+            }
 	}
 
 	/**
@@ -66,7 +131,15 @@ public class Run {
 	 * return null if there is no object at that index
 	 */
 	public Run get(int idx) {
-		return null; //to be completed
+		if(idx<0&&idx>this.size()){return null;}
+		if(this==null){return null;}
+        if(idx==0&&this.next==null&& this.prev==null){return this;}
+        else{
+			Run temp=this;
+            while(temp.prev!=null){temp=temp.prev;}
+            for(int i=0;i<idx;++i){temp=temp.next;}
+            return temp;
+        }
 	}
 	
 	/**
@@ -74,7 +147,19 @@ public class Run {
 	 * use "->" as the separator.
 	 */
 	public String toString() {
-		return null; //to be completed
+		if(this==null){return null;}
+		if(this.next==null&& this.prev==null){ return "Distance :"+this.distance+" Time :"+this.time;}
+		else{
+			String str="";
+			Run temp=this;
+			while(temp.prev!=null){temp=temp.prev;}
+			while(temp.next!=null){
+				str=str+temp.distance+" in "+temp.time+"  -->  ";
+				temp=temp.next;
+			}
+			str=str+temp.distance+" in "+temp.time;
+			return str;
+		}
 	}
 	
 	//DO NOT MODIFY
@@ -92,7 +177,22 @@ public class Run {
 	 * the given index in the list, false otherwise.
 	 */
 	public boolean add(int idx, Run run) {
-		return false; //to be completed
+		Run temporary=new Run(run);
+		if(idx<0&&idx>this.size()){return false;}
+		if(run==null){return false;}
+		if(idx==0&&this.next==null&& this.prev==null){this.addToFront(temporary); return true;}
+		else{
+			Run temp=this;
+			while(temp.prev!=null){temp=temp.prev;}
+			for(int i=0;i<idx;++i){temp=temp.next;}
+			temporary.prev=temp.prev;
+			temporary.next=temp;
+			temporary.prev.next=temporary;
+			temp.prev=temporary;
+			temporary=null;
+			temp=null;
+			return true;
+		}
 	}
 
 	/**
@@ -103,7 +203,24 @@ public class Run {
 	 * the thresholdSpeed.
 	 */
 	public int longestSequenceOver(double thresholdSpeed) {
-		return 0; //to be completed
+		if(this==null){return -1;}
+		if(this.next==null && this.prev==null&& this.speed()>thresholdSpeed){return 1;}
+		if(this.next==null && this.prev==null&& this.speed()<thresholdSpeed){return 0;}
+		else{
+			int count=0;
+			int maxcount=-1;
+			Run temp=this;
+			while(temp.prev!=null){temp=temp.prev;}
+			while(temp!=null){
+				if(temp.speed()>thresholdSpeed){
+					count++;
+					if(count>maxcount){maxcount=count;}
+				}
+				else{count=0;}
+				temp=temp.next;
+			}
+			return maxcount;
+		}
 	}
 
 	/**
@@ -114,6 +231,40 @@ public class Run {
 	 * the thresholdSpeed. return null if no such item exists in the list.
 	 */
 	public String[] getRunsOver(double thresholdSpeed) {
-		return null; //to be completed
+		String arr[] = new String[this.size()];
+		if(this==null){return null;}
+		if(this.next==null && this.prev==null&& this.speed()>thresholdSpeed){arr[0]=this.toStringIndividual(); return arr;}
+		if(this.next==null && this.prev==null&& this.speed()<thresholdSpeed){return null;}
+		else{
+			int count=0;
+			int maxcount=-1;
+			Run temp=this;
+			String temArr[]=new String[this.size()];
+			int tempIndex=0;
+			while(temp.prev!=null){temp=temp.prev;}
+			while(temp!=null){
+				if(temp.speed()>thresholdSpeed){
+					count++;
+					temArr[tempIndex]=temp.toStringIndividual()+"    ";
+					tempIndex++;
+					if(count>maxcount){
+						maxcount=count;
+						arr=temArr;
+					}
+				}
+				else{
+					tempIndex=0;
+					count=0;
+				}
+				temp=temp.next;
+			}
+			String finalArr[]=new String[maxcount];
+			for(int i=0;i<arr.length;i++){
+				if(arr[i]!=null){
+					finalArr[i]=arr[i];
+				}
+			}
+			return finalArr;
+		}
 	}
 }
